@@ -81,7 +81,6 @@ class MainActivity : AppCompatActivity() {
                 binding.tvHumidity.text = "Humidity: $humidity"
                 binding.etvCityName.text.clear()
                 binding.llLocation.isVisible = true
-                binding.ivErrorIcon.isVisible = false
 
                 if(now.toInt() >= 18 || now.toInt() <= 5)
                 {
@@ -125,14 +124,13 @@ class MainActivity : AppCompatActivity() {
                 Log.d("MainActivity", "Error Message: $it" )
                 Toast.makeText(this, "City Not Found !!! \n Please Enter a Valid City.", Toast.LENGTH_LONG).show()
 
-                binding.clMainBody.setBackgroundColor(Color.parseColor("#BFC9CA"))
+                binding.clMainBody.background = ResourcesCompat.getDrawable(resources, R.drawable.mainbg, null)
                 binding.etvCityName.setTextColor(Color.parseColor("#000000"))
                 binding.etvCityName.setHintTextColor(Color.parseColor("#000000"))
                 binding.etvCityName.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#000000"))
                 binding.ivPressMe.setColorFilter(Color.parseColor("#000000"))
 
                 binding.etvCityName.text.clear()
-                binding.ivErrorIcon.isVisible = true
                 binding.tvLocation.text = ""
                 binding.llLocation.isVisible = false
                 binding.tvCurrTemp.text = ""

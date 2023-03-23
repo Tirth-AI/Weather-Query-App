@@ -19,18 +19,6 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>
 
-    <ImageView
-        android:id="@+id/iv_errorIcon"
-        android:layout_width="150dp"
-        android:layout_height="150dp"
-        android:src="@drawable/ic_baseline_error_outline_24"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.38"
-        android:visibility="gone"/>
-
     <LinearLayout
         android:id="@+id/ll_searchBar"
         android:layout_width="match_parent"
