@@ -20,6 +20,8 @@ import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import com.tirthdalwadi.weatherquery.databinding.ActivityMainBinding
 import com.tirthdalwadi.weatherquery.databinding.ActivityMainBinding.inflate
+import com.tirthdalwadi.weatherquery.roomDB.CityName
+import com.tirthdalwadi.weatherquery.roomDB.CityNameDatabase
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.util.*

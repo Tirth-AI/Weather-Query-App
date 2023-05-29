@@ -1,6 +1,5 @@
-package com.tirthdalwadi.weatherquery
+package com.tirthdalwadi.weatherquery.roomDB
 
-import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert

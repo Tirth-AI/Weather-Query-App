@@ -1,4 +1,4 @@
-package com.tirthdalwadi.weatherquery
+package com.tirthdalwadi.weatherquery.roomDB
 
 import android.content.Context
 import androidx.room.Database
@@ -13,7 +13,7 @@ abstract class CityNameDatabase : RoomDatabase(){
         @Volatile
         var INSTANCE: CityNameDatabase? = null
 
-        fun getDatabase(context: Context): CityNameDatabase{
+        fun getDatabase(context: Context): CityNameDatabase {
             if(INSTANCE == null)
             {
                 synchronized(this){
