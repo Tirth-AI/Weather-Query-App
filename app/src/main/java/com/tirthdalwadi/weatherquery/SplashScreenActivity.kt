@@ -21,10 +21,8 @@ class SplashScreenActivity : AppCompatActivity() {
 
 
         val top = AnimationUtils.loadAnimation(this, R.anim.top)
-//        val bottom = AnimationUtils.loadAnimation(this, R.anim.bottom)
 
         binding.ivSplashScreen.animation = top
-//        binding.tvSplashScreen.animation = bottom
         Handler(Looper.getMainLooper()).postDelayed({
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)

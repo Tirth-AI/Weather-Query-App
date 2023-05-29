@@ -13,13 +13,4 @@
         android:layout_width="200dp"
         android:layout_height="200dp"
         android:src="@drawable/weatherqueryicon"/>
-
-<!--    <TextView-->
-<!--        android:id="@+id/tv_splashScreen"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:text="Weather Query"-->
-<!--        android:textSize="30sp"-->
-<!--        android:textStyle="bold"-->
-<!--        android:textColor="@color/black"/>-->
 </LinearLayout>
