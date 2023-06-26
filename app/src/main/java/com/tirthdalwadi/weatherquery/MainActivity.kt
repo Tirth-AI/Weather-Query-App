@@ -115,7 +115,12 @@ class MainActivity : AppCompatActivity() {
             } else {
                 Toast.makeText(
                     this,
-                    "GPS is Turned OFF \n Showing weather of last searched city",
+                    "GPS is Turned OFF",
+                    Toast.LENGTH_SHORT
+                ).show()
+                Toast.makeText(
+                    this,
+                    "Showing weather of last searched city",
                     Toast.LENGTH_LONG
                 ).show()
                 binding.pbLoading.isVisible = false
