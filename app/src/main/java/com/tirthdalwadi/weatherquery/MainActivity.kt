@@ -2,8 +2,12 @@ package com.tirthdalwadi.weatherquery
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.Manifest
+import android.content.pm.PackageManager
 import android.content.res.ColorStateList
 import android.graphics.Color
+import android.location.Location
+import android.location.LocationManager
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -12,26 +16,34 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.TextView.OnEditorActionListener
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isVisible
 import com.android.volley.Request
 import com.android.volley.RequestQueue
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.tirthdalwadi.weatherquery.databinding.ActivityMainBinding
 import com.tirthdalwadi.weatherquery.databinding.ActivityMainBinding.inflate
 import com.tirthdalwadi.weatherquery.roomDB.CityName
 import com.tirthdalwadi.weatherquery.roomDB.CityNameDatabase
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import java.io.IOException
 import java.util.*
 
 
 class MainActivity : AppCompatActivity() {
+    var fusedLocationProviderClient: FusedLocationProviderClient? = null
     private lateinit var binding: ActivityMainBinding
     private lateinit var database: CityNameDatabase
+    private var location: Location? = null
     private var newPlace: String? = null
     private var flag: Boolean = false
+    private val PERMISSION_ID = 101
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = inflate(layoutInflater)
@@ -39,7 +51,9 @@ class MainActivity : AppCompatActivity() {
 
         database = CityNameDatabase.getDatabase(this.applicationContext)
 
-        initialSearch()
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
+
+        getUserLocationWeather()
 
         binding.ivPressMe.setOnClickListener {
             closeKeyBoard()
@@ -50,8 +64,9 @@ class MainActivity : AppCompatActivity() {
         binding.etvCityName.setOnEditorActionListener(actionListener)
     }
 
+
     private fun initialSearch() {
-        var cityNameList: List<CityName> = emptyList()
+        var cityNameList: List<CityName>
         GlobalScope.launch {
             cityNameList = database.getCityNameDao().getCityName()
             if (cityNameList.isNotEmpty()) {
@@ -61,6 +76,89 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun getUserLocationWeather() {
+        Log.d("Debug", "Entered getUserLocationWeather()")
+        binding.pbLoading.isVisible = true
+        if (checkPermissions()) {
+            Log.d("Debug", "Permission Given")
+            if (isLocationEnabled()) {
+                Log.d("Debug", "Location is enabled")
+                if (ActivityCompat.checkSelfPermission(
+                        this,
+                        android.Manifest.permission.ACCESS_FINE_LOCATION
+                    ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                        this,
+                        Manifest.permission.ACCESS_COARSE_LOCATION
+                    ) != PackageManager.PERMISSION_GRANTED
+                ) {
+                    requestPermission()
+                    return
+                } else {
+                    fusedLocationProviderClient!!.lastLocation.addOnCompleteListener { task ->
+                        location = task.result
+                        Log.d("Debug", "$location")
+                        if (location != null) {
+                            try {
+                                val locationLatLng =
+                                    "${location!!.latitude},${location!!.longitude}"
+                                Log.d("Debug", "api called for current Location")
+                                callAPI(locationLatLng)
+                                newPlace = locationLatLng
+                            } catch (e: IOException) {
+                            }
+                        } else {
+                            binding.pbLoading.isVisible = false
+                            initialSearch()
+                        }
+                    }
+                }
+            } else {
+                Toast.makeText(
+                    this,
+                    "GPS is Turned OFF \n Showing weather of last searched city",
+                    Toast.LENGTH_LONG
+                ).show()
+                binding.pbLoading.isVisible = false
+                initialSearch()
+            }
+        } else {
+            binding.pbLoading.isVisible = false
+            requestPermission()
+        }
+    }
+
+    private fun isLocationEnabled(): Boolean {
+        val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+    }
+
+
+    private fun checkPermissions(): Boolean {
+        if (
+            ActivityCompat.checkSelfPermission(
+                this,
+                android.Manifest.permission.ACCESS_COARSE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED &&
+            ActivityCompat.checkSelfPermission(
+                this,
+                android.Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            return true
+        }
+        return false
+    }
+
+    private fun requestPermission() {
+        ActivityCompat.requestPermissions(
+            this,
+            arrayOf(
+                android.Manifest.permission.ACCESS_COARSE_LOCATION,
+                android.Manifest.permission.ACCESS_FINE_LOCATION
+            ),
+            PERMISSION_ID
+        )
+    }
 
     private val actionListener =
         OnEditorActionListener { _, actionId, _ ->
@@ -73,10 +171,25 @@ class MainActivity : AppCompatActivity() {
             false
         }
 
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == PERMISSION_ID) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this, "Permissions Granted", Toast.LENGTH_SHORT).show()
+                getUserLocationWeather()
+            } else {
+                Toast.makeText(this, "Permissions Denied", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
 
     @SuppressLint("SetTextI18n")
     private fun callAPI(place: String) {
-
         val url =
             "https://api.weatherapi.com/v1/current.json?key=68f3a3fc07c74f6c808111719231003&q="
         val newUrl = "$url$place&aqi=no"
@@ -195,7 +308,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun updateLatestCityName() {
-
         GlobalScope.launch {
             database.getCityNameDao().deleteAll()
             database.getCityNameDao().insertCityName(CityName(0, newPlace!!))
