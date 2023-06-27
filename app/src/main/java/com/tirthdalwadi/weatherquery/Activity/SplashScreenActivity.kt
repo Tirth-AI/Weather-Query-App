@@ -1,4 +1,4 @@
-package com.tirthdalwadi.weatherquery
+package com.tirthdalwadi.weatherquery.Activity
 
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
@@ -7,6 +7,7 @@ import android.os.Handler
 import android.os.Looper
 import android.view.WindowManager
 import android.view.animation.AnimationUtils
+import com.tirthdalwadi.weatherquery.R
 import com.tirthdalwadi.weatherquery.databinding.ActivitySplashScreenBinding
 import com.tirthdalwadi.weatherquery.databinding.ActivitySplashScreenBinding.inflate
 
